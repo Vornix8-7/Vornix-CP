@@ -15,6 +15,7 @@ def create_app():
     app.register_blueprint(main)
 
     with app.app_context():
+        init_db()
         migrate_db()
         init_coach_db()
 
