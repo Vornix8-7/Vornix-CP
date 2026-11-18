@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Login | Vornix CP{% endblock %}
+
+{% block auth_content %}
+<div class="auth-card">
+    <a href="/" class="brand auth-brand">VORNIX<span>CP</span></a>
+    <p class="eyebrow">WELCOME BACK</p>
+    <h1>Continue your progress.</h1>
+    <p class="muted">Your training journey is waiting.</p>
+
+    <form method="POST" class="form-stack">
+        <label>Username</label>
+        <input name="username" placeholder="Your username" required>
+
+        <label>Password</label>
+        <input name="password" type="password" placeholder="Your password" required>
+
+        <button type="submit" class="primary-button">Log in</button>
+    </form>
+
+    <p class="auth-footer">New to Vornix? <a href="{{ url_for('main.register') }}">Create account</a></p>
+</div>
+{% endblock %}

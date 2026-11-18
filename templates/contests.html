@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Virtual Contests | Vornix CP{% endblock %}
+{% block page_heading %}Virtual Contests{% endblock %}
+
+{% block content %}
+<div class="section-heading">
+    <div>
+        <p class="eyebrow">CONTEST TRAINING</p>
+        <h1>Virtual contest center</h1>
+        <p class="muted">Find past contests close to your current Codeforces rating.</p>
+    </div>
+</div>
+
+<div class="panel">
+    <p class="eyebrow">YOUR CURRENT LEVEL</p>
+    <h2>{{ rating }} rating</h2>
+    <p class="muted">Contest recommendations are ranked by the average rating of their problems.</p>
+</div>
+
+{% if error %}
+<div class="notice section-block">{{ error }}</div>
+{% endif %}
+
+<section class="section-block">
+    <div class="section-heading">
+        <h2>Recommended past contests</h2>
+    </div>
+
+    {% if recommendations %}
+    <div class="contest-grid">
+        {% for contest in recommendations %}
+        <div class="panel contest-card">
+            <p class="eyebrow">CONTEST #{{ contest.id }}</p>
+            <h3>{{ contest.name }}</h3>
+            <div class="contest-meta">
+                <span>Avg. rating: {{ contest.average }}</span>
+                <span>{{ contest.duration }} minutes</span>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('main.start_virtual_contest', contest_id=contest.id) }}">
+                <button class="primary-button" type="submit">Start tracking</button>
+            </form>
+
+            <a href="{{ contest.url }}" target="_blank" rel="noopener">
+                Open contest on Codeforces ↗
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="panel">
+        <p class="muted">No contest recommendations available right now.</p>
+    </div>
+    {% endif %}
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <h2>Active virtual contests</h2>
+    </div>
+
+    {% for attempt in active %}
+    <div class="panel contest-row">
+        <div>
+            <h3>{{ attempt.contest_name }}</h3>
+            <p class="muted">Started: {{ attempt.started_at }}</p>
+            <a href="https://codeforces.com/contest/{{ attempt.contest_id }}"
+               target="_blank" rel="noopener">Open contest ↗</a>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('main.finish_virtual_contest', attempt_id=attempt.id) }}">
+            <button class="primary-button" type="submit">Finish and calculate result</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="panel">
+        <p class="muted">You don't have any active virtual contests.</p>
+    </div>
+    {% endfor %}
+</section>
+
+<section class="section-block panel">
+    <p class="eyebrow">YOUR HISTORY</p>
+    <h2>Completed virtual contests</h2>
+
+    {% for attempt in history %}
+    <div class="problem-row">
+        <div>
+            <strong>{{ attempt.contest_name }}</strong>
+            <p class="muted">Contest #{{ attempt.contest_id }}</p>
+        </div>
+        <span class="status-tag">{{ attempt.solved_count }} solved</span>
+    </div>
+    {% else %}
+    <p class="muted">Your completed contests will appear here.</p>
+    {% endfor %}
+</section>
+{% endblock %}

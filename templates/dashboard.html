@@ -1,0 +1,195 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Vornix CP{% endblock %}
+{% block page_heading %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="welcome-row">
+    <div>
+        <p class="eyebrow">YOUR TRAINING OVERVIEW</p>
+        <h1>Welcome back, {{ username }}.</h1>
+        <p class="muted">Your progress, goals and next steps in one place.</p>
+    </div>
+    <a class="secondary-button" href="{{ url_for('main.profile') }}">Edit profile</a>
+</section>
+
+<section class="stats-grid">
+    <div class="stat-card">
+        <span class="stat-label">CURRENT RATING</span>
+        <strong>{{ user.current_rating if user.current_rating else "Unrated" }}</strong>
+        <span class="stat-foot">Codeforces</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">PEAK RATING</span>
+        <strong>{{ user.max_rating if user.max_rating else "—" }}</strong>
+        <span class="stat-foot">Personal best</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">PROBLEMS SOLVED</span>
+        <strong>{{ solved }}</strong>
+        <span class="stat-foot">{{ total }} in your collection</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">TARGET RATING</span>
+        <strong>{{ user.target_rating }}</strong>
+        <span class="stat-foot">Your next milestone</span>
+    </div>
+</section>
+
+<div class="dashboard-grid">
+    <section class="panel">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">PERFORMANCE</p>
+                <h2>Rating history</h2>
+            </div>
+            <span class="live-tag">Codeforces</span>
+        </div>
+
+        {% if rating_history %}
+        <div class="chart-container">
+            <canvas id="ratingChart"></canvas>
+        </div>
+        {% else %}
+        <div class="empty-chart">
+            <div class="empty-icon">↗</div>
+            <h3>No rating history yet</h3>
+            <p>Your rating changes will appear here after rated contests.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="panel goal-panel">
+        <p class="eyebrow">YOUR NEXT MILESTONE</p>
+        <h2>Reach {{ user.target_rating }}</h2>
+        <p class="muted">Current rating compared with your target.</p>
+
+        {% if user.current_rating %}
+        <div class="goal-numbers">
+            <strong>{{ user.current_rating }}</strong>
+            <span>{{ user.target_rating }} target</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill"
+                 style="width: {{ [100, (user.current_rating / user.target_rating * 100)|int]|min }}%">
+            </div>
+        </div>
+        <p class="muted">
+            {% if user.current_rating >= user.target_rating %}
+                Target reached! Set a new goal.
+            {% else %}
+                {{ user.target_rating - user.current_rating }} rating points to go.
+            {% endif %}
+        </p>
+        {% else %}
+        <p class="muted">Participate in a rated contest to start tracking your rating.</p>
+        {% endif %}
+
+        <div class="goal-divider"></div>
+        <div class="goal-detail">
+            <span>Weekly practice target</span>
+            <strong>{{ user.weekly_hours }} hours</strong>
+        </div>
+        <div class="goal-detail">
+            <span>Problems in progress</span>
+            <strong>{{ pending }}</strong>
+        </div>
+    </section>
+</div>
+
+<section class="section-block" id="training">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">YOUR NEXT STEPS</p>
+            <h2>Training center</h2>
+        </div>
+    </div>
+
+    <div class="feature-grid">
+        <a href="{{ url_for('main.find_problems') }}" class="feature-card">
+            <span class="feature-icon">⌕</span>
+            <h3>Find problems</h3>
+            <p>Explore Codeforces problems by name and rating.</p>
+            <span class="feature-link">Explore problems →</span>
+        </a>
+
+        <a href="{{ url_for('main.problems') }}" class="feature-card">
+            <span class="feature-icon">▤</span>
+            <h3>My problem list</h3>
+            <p>Manage your practice list and track solved problems.</p>
+            <span class="feature-link">Open collection →</span>
+        </a>
+
+        <a href="{{ url_for('main.profile') }}" class="feature-card">
+            <span class="feature-icon">◎</span>
+            <h3>Training goals</h3>
+            <p>Update your target rating and weekly practice time.</p>
+            <span class="feature-link">Edit goals →</span>
+        </a>
+    </div>
+</section>
+
+<section class="section-block" id="topics">
+    <div class="panel coming-panel">
+        <div>
+            <p class="eyebrow">PERSONALIZED ANALYSIS</p>
+            <h2>Core topic analysis</h2>
+            <p class="muted">Analyze your submissions and discover which topics need more practice.</p>
+        </div>
+        <a class="primary-button" href="{{ url_for('main.training') }}">Open Training Coach</a>
+    </div>
+</section>
+
+<section class="section-block" id="contests">
+    <div class="panel coming-panel">
+        <div>
+            <p class="eyebrow">CONTEST TRAINING</p>
+            <h2>Virtual contest recommendations</h2>
+            <p class="muted">Find past contests close to your Codeforces rating and track your results.</p>
+        </div>
+        <a class="primary-button" href="{{ url_for('main.contests') }}">Explore Contests</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% if rating_history %}
+<script>
+const historyData = {{ rating_history|tojson }};
+
+new Chart(document.getElementById("ratingChart"), {
+    type: "line",
+    data: {
+        labels: historyData.map(item => item.date),
+        datasets: [{
+            label: "Codeforces rating",
+            data: historyData.map(item => item.rating),
+            borderColor: "#60a5fa",
+            backgroundColor: "rgba(96, 165, 250, 0.12)",
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { color: "#8492aa", maxTicksLimit: 7 }
+            },
+            y: {
+                grid: { color: "rgba(148, 163, 184, 0.12)" },
+                ticks: { color: "#8492aa" }
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

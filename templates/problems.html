@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}My Problems | Vornix CP{% endblock %}
+{% block page_heading %}My Problems{% endblock %}
+
+{% block content %}
+<div class="section-heading">
+    <div>
+        <p class="eyebrow">YOUR COLLECTION</p>
+        <h1>Problem tracker</h1>
+        <p class="muted">Keep your practice organized.</p>
+    </div>
+</div>
+
+<section class="panel">
+    <h2>Add a problem</h2>
+    <form method="POST" class="form-stack">
+        <label>Problem name</label>
+        <input name="title" placeholder="Problem title" required>
+
+        <label>Platform</label>
+        <input name="platform" value="Codeforces" required>
+
+        <label>Problem ID (optional)</label>
+        <input name="external_id" placeholder="Example: 4A">
+
+        <label>Problem URL</label>
+        <input name="url" type="url" placeholder="https://...">
+
+        <label>Rating (optional)</label>
+        <input name="difficulty" type="number" placeholder="Example: 1200">
+
+        <label>Status</label>
+        <select name="status">
+            <option value="todo">To do</option>
+            <option value="in_progress">In progress</option>
+            <option value="solved">Solved</option>
+        </select>
+
+        <button class="primary-button" type="submit">Add problem</button>
+    </form>
+</section>
+
+<section class="section-block panel">
+    <div class="panel-heading">
+        <h2>Your problems</h2>
+        <form method="GET" class="filter-form">
+            <input name="q" value="{{ search }}" placeholder="Search title">
+            <select name="status">
+                <option value="">All statuses</option>
+                <option value="todo" {% if selected_status == 'todo' %}selected{% endif %}>To do</option>
+                <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>In progress</option>
+                <option value="solved" {% if selected_status == 'solved' %}selected{% endif %}>Solved</option>
+            </select>
+            <button class="secondary-button" type="submit">Filter</button>
+        </form>
+    </div>
+
+    {% if problems %}
+    <div class="problem-list">
+        {% for problem in problems %}
+        <div class="problem-row">
+            <div>
+                <strong>{{ problem.title }}</strong>
+                <p class="muted">
+                    {{ problem.platform }}
+                    {% if problem.difficulty %} · {{ problem.difficulty }}{% endif %}
+                </p>
+                {% if problem.url %}
+                    <a href="{{ problem.url }}" target="_blank" rel="noopener">Open problem ↗</a>
+                {% endif %}
+            </div>
+            <div class="problem-actions">
+                <span class="status-tag">{{ problem.status.replace('_', ' ') }}</span>
+                <form method="POST" action="{{ url_for('main.delete_problem', problem_id=problem.id) }}">
+                    <button class="delete-button" type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">No problems found. Add your first problem above.</p>
+    {% endif %}
+</section>
+{% endblock %}

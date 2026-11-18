@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Problem Finder | Vornix CP{% endblock %}
+{% block page_heading %}Problem Finder{% endblock %}
+
+{% block content %}
+<div class="section-heading">
+    <div>
+        <p class="eyebrow">CODEFORCES PROBLEMSET</p>
+        <h1>Find your next challenge</h1>
+        <p class="muted">Search Codeforces problems by name and rating.</p>
+    </div>
+</div>
+
+<section class="panel">
+    <form method="POST" class="form-stack">
+        <label>Problem name</label>
+        <input name="query" placeholder="Example: two sum">
+
+        <label>Minimum rating</label>
+        <input name="min_rating" type="number" min="800" placeholder="800">
+
+        <label>Maximum rating</label>
+        <input name="max_rating" type="number" max="4000" placeholder="2000">
+
+        <button class="primary-button" type="submit">Search Codeforces</button>
+    </form>
+</section>
+
+{% if error %}
+<div class="notice section-block">{{ error }}</div>
+{% endif %}
+
+{% if results %}
+<section class="section-block panel">
+    <h2>Search results</h2>
+    <div class="problem-list">
+        {% for problem in results %}
+        <div class="problem-row">
+            <div>
+                <strong>{{ problem.name }}</strong>
+                <p class="muted">
+                    Contest {{ problem.contest_id }} · {{ problem.index }}
+                    · Rating {{ problem.rating or "Unknown" }}
+                </p>
+                <a href="{{ problem.url }}" target="_blank" rel="noopener">Open on Codeforces ↗</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

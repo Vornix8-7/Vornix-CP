@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Training Coach | Vornix CP{% endblock %}
+{% block page_heading %}Personalized Training{% endblock %}
+
+{% block content %}
+<div class="section-heading">
+    <div>
+        <p class="eyebrow">YOUR PERSONAL CP COACH</p>
+        <h1>Training analysis</h1>
+        <p class="muted">Your Codeforces submissions, topic performance and recommended practice.</p>
+    </div>
+</div>
+
+{% if error %}
+<div class="notice">{{ error }}</div>
+{% endif %}
+
+<section class="stats-grid">
+    <div class="stat-card">
+        <span class="stat-label">ANALYZED SUBMISSIONS</span>
+        <strong>{{ submission_count }}</strong>
+        <span class="stat-foot">Codeforces history</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">TOPICS ANALYZED</span>
+        <strong>{{ stats|length }}</strong>
+        <span class="stat-foot">Detected problem tags</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">STRONG TOPICS</span>
+        <strong>{{ strong_topics|length }}</strong>
+        <span class="stat-foot">Good solving success rate</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">WEAK TOPICS</span>
+        <strong>{{ weak_topics|length }}</strong>
+        <span class="stat-foot">Topics to practise</span>
+    </div>
+</section>
+
+<div class="dashboard-grid section-block">
+    <section class="panel">
+        <p class="eyebrow">TOPIC PERFORMANCE</p>
+        <h2>Your strengths and weaknesses</h2>
+
+        {% if stats %}
+        <div class="topic-list">
+            {% for tag, data in stats.items()|sort(attribute='1.rate') %}
+            <div class="topic-row">
+                <div class="topic-info">
+                    <strong>{{ tag }}</strong>
+                    <span>{{ data.solved }} / {{ data.attempted }} problems solved</span>
+                </div>
+                <div class="topic-progress">
+                    <div style="width: {{ data.rate }}%"></div>
+                </div>
+                <strong>{{ data.rate }}%</strong>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="muted">No submission data yet. Try syncing your Codeforces account.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <p class="eyebrow">YOUR ANALYSIS</p>
+        <h2>Topic overview</h2>
+
+        <h3 class="topic-good">Strong topics</h3>
+        {% for topic in strong_topics %}
+            <span class="topic-chip">{{ topic }}</span>
+        {% else %}
+            <p class="muted">Not enough data yet.</p>
+        {% endfor %}
+
+        <div class="goal-divider"></div>
+
+        <h3 class="topic-weak">Topics to improve</h3>
+        {% for topic in weak_topics %}
+            <span class="topic-chip">{{ topic }}</span>
+        {% else %}
+            <p class="muted">Not enough data yet.</p>
+        {% endfor %}
+    </section>
+</div>
+
+<section class="panel section-block">
+    <p class="eyebrow">PERSONALIZED PRACTICE</p>
+    <h2>Recommended problems</h2>
+    <p class="muted">Unsolved problems matching your weaker topics and approximate rating.</p>
+
+    {% if recommendations %}
+    <div class="problem-list">
+        {% for problem in recommendations %}
+        <div class="problem-row">
+            <div>
+                <strong>{{ problem.name }}</strong>
+                <p class="muted">
+                    Rating {{ problem.rating }} ·
+                    {{ problem.matches|join(", ") }}
+                </p>
+                <a href="{{ problem.url }}" target="_blank" rel="noopener">Solve on Codeforces ↗</a>
+            </div>
+            <span class="status-tag">Recommended</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">Recommendations will appear when enough submission data is available.</p>
+    {% endif %}
+</section>
+{% endblock %}

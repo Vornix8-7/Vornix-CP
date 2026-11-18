@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Vornix CP{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+{% if session.get("user_id") %}
+<div class="app-layout">
+    <aside class="sidebar">
+        <a href="{{ url_for('main.dashboard') }}" class="brand">VORNIX<span>CP</span></a>
+
+        <div class="nav-label">WORKSPACE</div>
+        <nav class="side-nav">
+            <a href="{{ url_for('main.dashboard') }}">◫ <span>Dashboard</span></a>
+            <a href="{{ url_for('main.find_problems') }}">⌕ <span>Problem Finder</span></a>
+            <a href="{{ url_for('main.problems') }}">▤ <span>My Problems</span></a>
+        </nav>
+
+        <div class="nav-label">TRAINING</div>
+        <nav class="side-nav">
+            <a href="{{ url_for('main.training') }}">◎ <span>Training Coach</span></a>
+            <a href="{{ url_for('main.contests') }}">◷ <span>Virtual Contests</span></a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('main.profile') }}">⚙ <span>Profile settings</span></a>
+            <a href="{{ url_for('main.logout') }}">↪ <span>Log out</span></a>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <header class="topbar">
+            <div>
+                <span class="topbar-label">COMPETITIVE PROGRAMMING</span>
+                <div class="topbar-title">{% block page_heading %}Dashboard{% endblock %}</div>
+            </div>
+            <div class="user-chip">
+                <span class="user-avatar">{{ session.get("username", "U")[0]|upper }}</span>
+                {{ session.get("username") }}
+            </div>
+        </header>
+
+        <div class="page-content">
+            {% for message in get_flashed_messages() %}
+                <div class="notice">{{ message }}</div>
+            {% endfor %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+{% else %}
+<main class="auth-layout">
+    {% for message in get_flashed_messages() %}
+        <div class="notice">{{ message }}</div>
+    {% endfor %}
+    {% block auth_content %}{% endblock %}
+</main>
+{% endif %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

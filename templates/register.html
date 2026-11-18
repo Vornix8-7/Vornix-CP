@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Create account | Vornix CP{% endblock %}
+
+{% block auth_content %}
+<div class="auth-card">
+    <a href="/" class="brand auth-brand">VORNIX<span>CP</span></a>
+    <p class="eyebrow">YOUR PERSONAL CP TRAINER</p>
+    <h1>Create your account</h1>
+    <p class="muted">Set up your profile and training goals.</p>
+
+    <form method="POST" class="form-stack">
+        <label>Username</label>
+        <input name="username" placeholder="Your username" required>
+
+        <label>Email</label>
+        <input name="email" type="email" placeholder="you@example.com" required>
+
+        <label>Password</label>
+        <input name="password" type="password" minlength="8" placeholder="At least 8 characters" required>
+
+        <div class="form-divider">YOUR TRAINING PROFILE</div>
+
+        <label>Codeforces handle</label>
+        <input name="cf_handle" placeholder="Your Codeforces username" required>
+
+        <label>Target rating</label>
+        <input name="target_rating" type="number" min="800" max="4000" value="1600" required>
+
+        <label>Practice hours per week</label>
+        <input name="weekly_hours" type="number" min="1" max="60" value="7" required>
+
+        <button type="submit" class="primary-button">Create my account</button>
+    </form>
+
+    <p class="auth-footer">Already registered? <a href="{{ url_for('main.login') }}">Log in</a></p>
+</div>
+{% endblock %}
